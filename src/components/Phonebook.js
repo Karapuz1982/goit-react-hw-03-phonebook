@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 import { nanoid } from 'nanoid';
 import ContactForm from './ContactForm';
@@ -7,13 +8,13 @@ import { Container, Title } from './Phonebook styled';
 
 class Phonebook extends Component {
   state = {
-    contacts: [ ],
+    contacts: [],
     filter: '',
   };
 
   componentDidMount() {
     const savedContacts = localStorage.getItem('contacts');
-     console.log('localStorage contacts:', savedContacts);
+    console.log('localStorage contacts:', savedContacts);
     if (savedContacts) {
       this.setState({ contacts: JSON.parse(savedContacts) });
     }
@@ -28,22 +29,25 @@ class Phonebook extends Component {
   }
 
   addContact = (name, number) => {
-      const { contacts } = this.state;
-      
-       const isDuplicate = contacts.some((contact) => contact.name.toLowerCase() === name.toLowerCase());
+    this.setState((prevState) => {
+      const { contacts } = prevState;
 
-    if (isDuplicate) {
-      alert(`Contact with name "${name}" already exists.`);
-      return;
-    }
+      const isDuplicate = contacts.some(
+        (contact) => contact.name.toLowerCase() === name.toLowerCase()
+      );
 
+      if (isDuplicate) {
+        alert(`Contact with name "${name}" already exists.`);
+        return prevState; 
+      }
 
-    const newContact = {
-      id: nanoid(),
-      name,
-      number,
-    };
-    this.setState({ contacts: [...contacts, newContact] });
+      const newContact = {
+        id: nanoid(),
+        name,
+        number,
+      };
+      return { contacts: [...contacts, newContact] };
+    });
   };
 
   deleteContact = (contactId) => {
@@ -74,7 +78,6 @@ class Phonebook extends Component {
         <h2>Contacts</h2>
         <Filter value={filter} onChangeFilter={this.changeFilter} />
         <ContactList contacts={filteredContacts} onDeleteContact={this.deleteContact} />
-        
       </Container>
     );
   }
